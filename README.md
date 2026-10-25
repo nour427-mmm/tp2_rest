@@ -192,8 +192,6 @@ public Response produitChemin(@PathParam("a") int a, @PathParam("b") int b) {
 
 Test : `GET /calcul/produit/6/7` → `42`.
 
-> 📸 **CAPTURE 19** : Test `GET /calcul/produit/6/7` (résultat 42)
-
 **Question D.3 : Quelle différence y a-t-il entre `@QueryParam` et `@PathParam` ? Laquelle utilise-t-on pour lire l'identifiant dans `/operations/{id}` ?**
 
 - `@QueryParam` lit un paramètre placé **après le `?`** (`?a=2&b=3`). Il sert surtout pour des options, des filtres ou des valeurs facultatives.
@@ -223,7 +221,8 @@ public Response sommeDetail(@QueryParam("a") int a, @QueryParam("b") int b) {
 
 Test : `curl -i ".../calcul/somme/detail?a=2&b=3"`. Résultat : statut `200`, `Content-Type: application/json`, corps `{"operation":"somme","a":2,"b":3,"resultat":5.0}` (l'ordre des champs peut varier selon la bibliothèque JSON).
 
-> 📸 **CAPTURE 20** : `curl -i` sur `somme/detail?a=2&b=3` (200, application/json, corps JSON)
+<img width="1437" height="827" alt="Capture d&#39;écran 2026-10-25 171828" src="https://github.com/user-attachments/assets/124f796d-b640-4f0a-9e1d-1cab37b8a215" />
+
 
 **Question E.1 : Qui a effectué la conversion en JSON ? D'où viennent les noms `a`, `b`, `operation` et `resultat` ?**
 
@@ -233,37 +232,14 @@ La conversion est faite automatiquement par **Jersey**, grâce au module JSON (`
 
 Tests avec `curl -i -H "Accept: application/json"` puis `-H "Accept: application/xml"` sur `somme/detail`.
 
-> 📸 **CAPTURE 21** : `curl -i` avec `Accept: application/json` (statut 200)
 
-> 📸 **CAPTURE 22** : `curl -i` avec `Accept: application/xml` (statut 406)
+<img width="1437" height="972" alt="Capture d&#39;écran 2026-10-25 172356" src="https://github.com/user-attachments/assets/4df034e9-f961-4423-b14e-ecc08a78904d" />
+
 
 **Question E.2 : Pourquoi la seconde requête est-elle refusée ?**
 
 Le client demande du XML (`Accept: application/xml`), mais la méthode ne sait produire que du JSON (`@Produces(MediaType.APPLICATION_JSON)`). Aucun format ne satisfait le client, donc le serveur répond **406 (Not Acceptable)**.
 
-### E.4 Exercice : `divisionDetail`
-
-```java
-@GET
-@Path("/division/detail")
-@Produces(MediaType.APPLICATION_JSON)
-public Response divisionDetail(@QueryParam("a") int a, @QueryParam("b") int b) {
-    if (b == 0) {
-        return Response.status(Response.Status.BAD_REQUEST)
-                .type(MediaType.TEXT_PLAIN)
-                .entity("Erreur : Division par zero impossible")
-                .build();
-    }
-    Resultat res = new Resultat("division", a, b, calculService.division(a, b));
-    return Response.ok(res).build();
-}
-```
-
-> 📸 **CAPTURE 23** : `curl -i` sur `division/detail?a=7&b=2` (200 et JSON)
-
-> 📸 **CAPTURE 24** : `curl -i` sur `division/detail?a=7&b=0` (400)
-
----
 
 ## Partie F : La ressource « operations » (POST, GET, PUT, DELETE)
 
@@ -300,19 +276,25 @@ public Response creer(Operation op, @Context UriInfo uriInfo) {
 | 6 | `POST /operations` | `{"operateur":"division","a":7,"b":0}` | 400 | `{"erreur":"Operateur invalide ou division par zero"}` |
 | 7 | `POST /operations` | `{"operateur":"racine","a":9,"b":0}` | 400 | `{"erreur":"Operateur invalide ou division par zero"}` |
 
-> 📸 **CAPTURE 25** : Test 1 : POST somme 8+2 (statut 201, corps JSON et en-tête Location)
+<img width="1448" height="847" alt="image" src="https://github.com/user-attachments/assets/172be471-bdc3-4279-ac82-9f56ea654a39" />
 
-> 📸 **CAPTURE 26** : Test 2 : POST division 7/2 (statut 201, résultat 3.5)
 
-> 📸 **CAPTURE 27** : Test 3 : GET /operations (statut 200, tableau des deux opérations)
+<img width="1440" height="861" alt="image" src="https://github.com/user-attachments/assets/b4d66191-a535-4e9f-bc37-faff15cc688d" />
 
-> 📸 **CAPTURE 28** : Test 4 : GET /operations/2 (statut 200)
 
-> 📸 **CAPTURE 29** : Test 5 : GET /operations/99 (statut 404, corps vide)
+<img width="1443" height="1078" alt="image" src="https://github.com/user-attachments/assets/2e396a14-4516-4c28-8295-8086784bb13a" />
 
-> 📸 **CAPTURE 30** : Test 6 : POST division 7/0 (statut 400 et message d'erreur)
 
-> 📸 **CAPTURE 31** : Test 7 : POST opérateur « racine » (statut 400 et message d'erreur)
+<img width="1440" height="862" alt="image" src="https://github.com/user-attachments/assets/3856bd92-a05b-425d-bb11-2fb723a2bcdd" />
+
+
+<img width="1438" height="758" alt="image" src="https://github.com/user-attachments/assets/1ce7d7bc-fc5e-43d6-a9da-47bbd544e5bc" />
+
+
+<img width="1436" height="687" alt="image" src="https://github.com/user-attachments/assets/02f71940-9f53-408a-8b3e-0fbd280bade8" />
+
+
+<img width="1432" height="756" alt="image" src="https://github.com/user-attachments/assets/5d597c0f-e033-46f4-85b0-62a86e7083f0" />
 
 ### F.4 Modifier une opération : PUT
 
@@ -320,25 +302,17 @@ Statuts : 404 (id inexistant), 400 (calcul impossible), 200 (modification réuss
 
 Test principal : `PUT /operations/1` avec `{"operateur":"produit","a":8,"b":2}` → 200, `resultat` 16.0.
 
-> 📸 **CAPTURE 32** : PUT sur un id inexistant, par exemple `/operations/99` (statut 404)
+<img width="1437" height="991" alt="image" src="https://github.com/user-attachments/assets/5b10b4bc-e066-443d-95cc-a1ae968240ba" />
 
-> 📸 **CAPTURE 33** : PUT sur `/operations/1` avec un calcul impossible (statut 400)
 
-> 📸 **CAPTURE 34** : PUT `/operations/1` avec `{"operateur":"produit","a":8,"b":2}` (statut 200, résultat 16.0)
+<img width="1431" height="655" alt="image" src="https://github.com/user-attachments/assets/ac35b822-c7c6-45cb-8b4e-5731d9071563" />
 
-> 📸 **CAPTURE 35** : GET `/operations/1` après la modification (résultat 16.0 confirmé)
 
-### F.5 Supprimer une opération : DELETE
+<img width="1438" height="751" alt="image" src="https://github.com/user-attachments/assets/a8b51868-a130-467e-a73a-d8eedcaced2e" />
 
-Tests dans l'ordre : `DELETE /operations/1` → 204, puis `GET /operations/1` → 404, puis `DELETE /operations/1` → 404.
+<img width="1433" height="720" alt="image" src="https://github.com/user-attachments/assets/1e0e9456-7e00-490d-a6d0-898f464528a7" />
 
-> 📸 **CAPTURE 36** : Premier DELETE `/operations/1` (statut 204)
 
-> 📸 **CAPTURE 37** : GET `/operations/1` après suppression (statut 404)
-
-> 📸 **CAPTURE 38** : Second DELETE `/operations/1` (statut 404)
-
----
 
 ## Questions de synthèse
 
